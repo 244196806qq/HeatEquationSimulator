@@ -26,7 +26,7 @@ def solve_heat_1d(initial_temp, r, numTimes):
     
     return temps
 
-# initial condition function generator
+# initial condition function generator 
 def generate_initial_temperatures():
     Nx = 101
     x = np.linspace(0, 1, Nx)
