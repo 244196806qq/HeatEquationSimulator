@@ -54,7 +54,7 @@ def main():
     r = alpha * deltaT / (deltaX ** 2)
     numTimes = 10000 # number of times it's simulated
     temps = solve_heat_1d(initial_temp, r, numTimes)
-    plot_temps(temps)
+    plot_temps(temps) # plot and show graph of simulation
 
 if __name__ == "__main__":
     main()
