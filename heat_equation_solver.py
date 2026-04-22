@@ -1,6 +1,6 @@
 import numpy as np
-import matplotlib.pyplot as plt
-from matplotlib.animation import FuncAnimation
+
+
 
 # solver
 def solve_heat_1d(initial_temp, r, numTimes):
@@ -22,16 +22,15 @@ def solve_heat_1d(initial_temp, r, numTimes):
                 # compute u^{n+1} from u^n using the explicit finite-difference heat update
                 newTemp = current + r * (right - 2 * current + left) 
                 new_temps.append(newTemp)
-        temps.append(new_temps)
+        temps.append(np.array(new_temps))
     
     return temps
 
+
+
 # initial condition function generator 
-def generate_initial_temperatures():
-    Nx = 101
-    x = np.linspace(0, 1, Nx)
-    center = 0.5
-    width = 0.1
+def generate_initial_temperatures(Nx = 101, center = 0.5, width = 0.1):
+    x = np.linspace(0, 1, int(Nx))
     initial_temp = np.exp(-((x - center) ** 2) / (2 * width ** 2))
     initial_temp[0] = 0
     initial_temp[-1] = 0
