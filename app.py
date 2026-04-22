@@ -5,13 +5,9 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from heat_equation_solver import gaussian_initial_temperatures, solve_heat_1d, two_peak_initial_conidtion, spikes_initial_temperatures
 
 
-def run_simulation(fig, canvas, initcond, alpha, Nx, center, width, is_animating):
-    if is_animating["value"]:
-        return
+def run_simulation(fig, canvas, initcond, alpha, Nx, width, shape_var):
 
-    is_animating["value"] = True
-
-    x, initial_temp = generate_initial_condition(initcond, Nx, center, width)
+    x, initial_temp = generate_initial_condition(initcond, Nx, width, shape_var)
     
     temps = calculate_parameter(alpha, x, initial_temp)
     fig.clear()
@@ -29,21 +25,24 @@ def run_simulation(fig, canvas, initcond, alpha, Nx, center, width, is_animating
             return 
         
         line.set_ydata(temps[frame])
+
+        # current_max = max(temps[frame])
+        # print(current_max)
         canvas.draw_idle()
 
-        canvas.get_tk_widget().after(30, update, frame + 1)
+        canvas.get_tk_widget().after(100, update, frame + 1)
     
     update()
 
 
 
-def generate_initial_condition(initcond, Nx, center, width):
+def generate_initial_condition(initcond, Nx, width, shar_var):
     if (initcond == "Gaussian"):
-        return gaussian_initial_temperatures(Nx, center, width)
+        return gaussian_initial_temperatures(Nx, shar_var["center_slider"].get(), width)
     elif (initcond == "Spike"):
-        return spikes_initial_temperatures(Nx, center, width)
+        return spikes_initial_temperatures(Nx)
     elif (initcond == "Two Peaks"):
-        return two_peak_initial_conidtion(Nx, center, width)
+        return two_peak_initial_conidtion(Nx, shar_var["center1_slider"].get(), width)
     else:
         raise ValueError(f"Unknown initial condition: {initcond}")
 
@@ -53,24 +52,86 @@ def calculate_parameter(alpha, x, initial_temp):
     deltaX = x[1] - x[0]
     deltaT = 0.0001
     r = 0.4 #alpha * deltaT / (deltaX ** 2)
-    numTimes = 100 # number of times it's simulated
+    numTimes = 10000
     return solve_heat_1d(initial_temp, r, numTimes)
 
 
-def create_controls(control_frame, fig, canvas, is_animating):
-    # dropdown menu
-    initial_condition_var = tk.StringVar()
-    initial_condition_var.set("Gaussian")
-    condition_dropdown = tk.OptionMenu(
-        control_frame,
-        initial_condition_var,
-        "Gaussian",
-        "Spike",
-        "Two Peaks"
-    )
-    condition_dropdown.pack()
+def clear_frame(frame):
+    for widget in frame.winfo_children():
+        widget.destroy()
 
 
+def build_parameter_controls(parameter_frame, shape_var):
+    clear_frame(parameter_frame)
+    controls = {}
+
+    shape = shape_var.get()
+
+    if shape == "Gaussian":
+        center_slider = tk.Scale(
+            parameter_frame, from_=0.0, to=1.0, resolution=0.05,
+            orient=tk.HORIZONTAL, label="Center"
+        )
+        center_slider.set(0.5)
+        center_slider.pack()
+
+        width_slider = tk.Scale(
+            parameter_frame, from_=0.02, to=0.3, resolution=0.01,
+            orient=tk.HORIZONTAL, label="Width"
+        )
+        width_slider.set(0.1)
+        width_slider.pack()
+
+        controls["center_slider"] = center_slider
+        controls["width_slider"] = width_slider
+
+    elif shape == "Spike":
+        position_slider = tk.Scale(
+            parameter_frame, from_=0.0, to=1.0, resolution=0.05,
+            orient=tk.HORIZONTAL, label="Position"
+        )
+        position_slider.set(0.5)
+        position_slider.pack()
+
+        controls["position_slider"] = position_slider
+
+    elif shape == "Two Peaks":
+        center1_slider = tk.Scale(
+            parameter_frame, from_=0.0, to=1.0, resolution=0.05,
+            orient=tk.HORIZONTAL, label="Center 1"
+        )
+        center1_slider.set(0.3)
+        center1_slider.pack()
+
+        width1_slider = tk.Scale(
+            parameter_frame, from_=0.02, to=0.3, resolution=0.01,
+            orient=tk.HORIZONTAL, label="Width 1"
+        )
+        width1_slider.set(0.08)
+        width1_slider.pack()
+
+        center2_slider = tk.Scale(
+            parameter_frame, from_=0.0, to=1.0, resolution=0.05,
+            orient=tk.HORIZONTAL, label="Center 2"
+        )
+        center2_slider.set(0.7)
+        center2_slider.pack()
+
+        width2_slider = tk.Scale(
+            parameter_frame, from_=0.02, to=0.3, resolution=0.01,
+            orient=tk.HORIZONTAL, label="Width 2"
+        )
+        width2_slider.set(0.08)
+        width2_slider.pack() 
+
+        controls["center1_slider"] = center1_slider
+        controls["width1_slider"] = width1_slider
+        controls["center2_slider"] = center2_slider
+        controls["width2_slider"] = width2_slider
+
+    return controls
+
+def create_controls(control_frame, fig, canvas):
     # slider for alpha
     alpha_slider = tk.Scale(
         control_frame, 
@@ -95,18 +156,6 @@ def create_controls(control_frame, fig, canvas, is_animating):
     width_slider.set(0.2)
     width_slider.pack()
 
-    # slider for center
-    center_slider = tk.Scale(
-        control_frame, 
-        from_ = 0.01,
-        to = 1,
-        resolution = 0.05,
-        orient = tk.HORIZONTAL,
-        label = "Center"
-    )
-    center_slider.set(0.5)
-    center_slider.pack()
-
     # slider for number of position points
     Nx_slider = tk.Scale(
         control_frame, 
@@ -117,7 +166,33 @@ def create_controls(control_frame, fig, canvas, is_animating):
         label = "Nx"
     )
     Nx_slider.set(100)
-    Nx_slider.pack()
+    Nx_slider.pack()    
+
+     # dropdown menu
+    shape_var = tk.StringVar()
+    shape_var.set("Gaussian")
+    condition_dropdown = tk.OptionMenu(
+        control_frame,
+        shape_var,
+        "Gaussian",
+        "Spike",
+        "Two Peaks"
+    )
+    condition_dropdown.pack()
+
+    # parameter menu
+    parameter_frame = tk.Frame(control_frame)
+    parameter_frame.pack()
+    
+    shape_controls = {}
+
+    def on_shape_change(*args):
+        nonlocal shape_controls
+        shape_controls = build_parameter_controls(parameter_frame, shape_var)
+
+    shape_var.trace_add("write", on_shape_change)
+
+    shape_controls = build_parameter_controls(parameter_frame, shape_var)
 
     # Run button
     runButton = tk.Button(
@@ -126,12 +201,11 @@ def create_controls(control_frame, fig, canvas, is_animating):
         command = lambda: run_simulation(
             fig, 
             canvas, 
-            initial_condition_var.get(), 
+            shape_var.get(), 
             alpha_slider.get(),
-            Nx_slider.get(), 
-            center_slider.get(), 
+            Nx_slider.get(),  
             width_slider.get(),
-            is_animating
+            shape_controls
         )
     )
     runButton.pack()
@@ -139,7 +213,7 @@ def create_controls(control_frame, fig, canvas, is_animating):
     return {
         "alpha_slider": alpha_slider,
         "width_slider": width_slider,
-        "center_slider": center_slider,
+        "center_slider": 1,
         "Nx_slider": Nx_slider,
         "condition_dropmenu": condition_dropdown,
         "run_button": runButton,
@@ -153,7 +227,6 @@ def create_controls(control_frame, fig, canvas, is_animating):
 def create_window():
     root = tk.Tk()
     root.title("Heat Equation App")
-    is_animating = {"value": False}
 
     control_frame = tk.Frame(root)
     control_frame.pack(side=tk.LEFT, fill=tk.Y)
@@ -167,7 +240,7 @@ def create_window():
     canvas.draw_idle()
     canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
 
-    controls = create_controls(control_frame, fig, canvas, is_animating)
+    controls = create_controls(control_frame, fig, canvas)
 
     root.mainloop()
 
