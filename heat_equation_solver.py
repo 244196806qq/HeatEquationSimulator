@@ -29,26 +29,22 @@ def solve_heat_1d(initial_temp, r, numTimes):
 
 
 # initial condition function generator 
-def gaussian_initial_temperatures(Nx = 101, center = 0.5, width = 0.1):
+def gaussian_initial_temperatures(Nx, center = 0.5, width = 0.1):
     x = np.linspace(0, 1, int(Nx))
     initial_temp = np.exp(-((x - center) ** 2) / (2 * width ** 2))
-    initial_temp[0] = 0
-    initial_temp[-1] = 0
+    # initial_temp[0] = 0
+    # initial_temp[-1] = 0
     return x, initial_temp
 
 
-def two_peak_initial_conidtion(Nx = 101, center = 0.5, width = 0.1, height = 1.0):
+def two_peak_initial_conidtion(Nx, center = 0.5, width = 0.1, height = 1.0):
     x = np.linspace(0, 1, int(Nx))
     peak1 = height * np.exp(-((x - center) ** 2) / (2 * width ** 2))
     peak2 = np.random.rand() * height * np.exp(-((x - (np.random.rand() * center)) ** 2) / (2 * (np.random.rand() * width) ** 2))
     initial_temp = peak1 + peak2
-    initial_temp[0] = 0
-    initial_temp[-1] = 0
     return x, initial_temp
 
-def spikes_initial_temperatures(Nx = 101, center = 0.5, width = 0.1):
+def spikes_initial_temperatures(Nx):
     x = np.linspace(0, 1, int(Nx))
     initial_temp = np.random.rand(Nx)
-    initial_temp[0] = 0
-    initial_temp[-1] = 0
     return x, initial_temp
