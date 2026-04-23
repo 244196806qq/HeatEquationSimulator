@@ -4,7 +4,8 @@ from tkinter import messagebox
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
-from heat_equation_solver_1D import gaussian_initial_temperatures, solve_heat_1d, two_peak_initial_conidtion, spikes_initial_temperatures
+from heat_equation_solver_1D import gaussian_initial_temperatures_1D, solve_heat_1D, two_peak_initial_condition_1D, spikes_initial_temperatures_1D
+from heat_equation_solver_2D import gaussian_initial_temperatures_2D, solve_heat_2D, two_peak_initial_condition_2D, spike_initial_temperatures_2D
 
 
 def run_simulation(fig, canvas, initcond, alpha, Nx, numTimes, shape_controls):
@@ -78,11 +79,11 @@ def run_simulation(fig, canvas, initcond, alpha, Nx, numTimes, shape_controls):
 
 def generate_initial_condition(initcond, Nx, shape_controls):
     if (initcond == "Gaussian"):
-        return gaussian_initial_temperatures(Nx, shape_controls["center_slider"].get(), shape_controls["width_slider"].get())
+        return gaussian_initial_temperatures_1D(Nx, shape_controls["center_slider"].get(), shape_controls["width_slider"].get())
     elif (initcond == "Spike"):
-        return spikes_initial_temperatures(Nx, shape_controls["position_slider"].get(), shape_controls["height_slider"].get())
+        return spikes_initial_temperatures_1D(Nx, shape_controls["position_slider"].get(), shape_controls["height_slider"].get())
     elif (initcond == "Two Peaks"):
-        return two_peak_initial_conidtion(
+        return two_peak_initial_condition_1D(
             Nx, 
             shape_controls["center1_slider"].get(), 
             shape_controls["width1_slider"].get(), 
@@ -99,7 +100,7 @@ def calculate_parameter(alpha, x, numTimes, initial_temp):
     deltaX = x[1] - x[0]
     deltaT = 0.001
     r = alpha * deltaT / (deltaX ** 2)
-    return solve_heat_1d(initial_temp, r, numTimes)
+    return solve_heat_1D(initial_temp, r, numTimes)
 
 def update_r_label(alpha_slider, Nx_slider, r_label):
     alpha = alpha_slider.get()
