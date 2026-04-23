@@ -63,12 +63,12 @@ def spike_initial_temperatures_2D(Nx, Ny, x_pos=0.5, y_pos=0.5, height=1.0):
     u[j, i] = height
     return X, Y, u
 
-X, Y, initial_temp = spike_initial_temperatures_2D(80, 80)
-temps = solve_heat_2D(initial_temp, r_x = 0.2, r_y = 0.2, num_times=200)
+# X, Y, initial_temp = spike_initial_temperatures_2D(80, 80)
+# temps = solve_heat_2D(initial_temp, r_x = 0.2, r_y = 0.2, num_times=200)
 
-plt.imshow(temps[0], origin="lower", cmap="hot", extent=[0, 1, 0, 1])
-plt.colorbar(label="Temperature")
-plt.title("Initial 2D Temperature")
-plt.xlabel("x")
-plt.ylabel("y")
-plt.show()
+# plt.imshow(temps[0], origin="lower", cmap="hot", extent=[0, 1, 0, 1])
+# plt.colorbar(label="Temperature")
+# plt.title("Initial 2D Temperature")
+# plt.xlabel("x")
+# plt.ylabel("y")
+# plt.show()
