@@ -4,7 +4,7 @@ from tkinter import messagebox
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
-from heat_equation_solver_1D import gaussian_initial_temperatures, solve_heat_1d, two_peak_initial_conidtion, spikes_initial_temperatures
+from heat_equation_solver import gaussian_initial_temperatures, solve_heat_1d, two_peak_initial_conidtion, spikes_initial_temperatures
 
 
 def run_simulation(fig, canvas, initcond, alpha, Nx, numTimes, shape_controls):
