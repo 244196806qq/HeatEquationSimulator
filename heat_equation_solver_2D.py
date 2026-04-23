@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def solve_heat_2d(initial_temp, r_x, r_y, num_times):
+def solve_heat_2D(initial_temp, r_x, r_y, num_times):
     temps = [np.array(initial_temp, dtype = float)]
     for _ in range(num_times):
         current = temps[-1]
@@ -22,7 +22,7 @@ def solve_heat_2d(initial_temp, r_x, r_y, num_times):
         temps.append(u_new)
     return temps
 
-def gaussian_initial_temperatures_2d(Nx, Ny, center_x, center_y, width):
+def gaussian_initial_temperatures_2D(Nx, Ny, center_x, center_y, width):
     x = np.linspace(0, 1, int(Nx))
     y = np.linspace(0, 1, int(Ny))
     X, Y = np.meshgrid(x,y)
@@ -34,7 +34,7 @@ def gaussian_initial_temperatures_2d(Nx, Ny, center_x, center_y, width):
     return X, Y, initial_temp
 
 
-def two_peaks_initial_condition_2d(
+def two_peak_initial_condition_2D(
     Nx, Ny,
     center1=(0.3, 0.3), width1=0.08, height1=1.0,
     center2=(0.7, 0.7), width2=0.08, height2=1.0
@@ -52,8 +52,19 @@ def two_peaks_initial_condition_2d(
 
     return X, Y, peak1 + peak2
 
-X, Y, initial_temp = two_peaks_initial_condition_2d(80, 80)
-temps = solve_heat_2d(initial_temp, r_x = 0.2, r_y = 0.2, num_times=200)
+def spike_initial_temperatures_2D(Nx, Ny, x_pos=0.5, y_pos=0.5, height=1.0):
+    x = np.linspace(0, 1, int(Nx))
+    y = np.linspace(0, 1, int(Ny))
+    X, Y = np.meshgrid(x, y)
+
+    u = np.zeros_like(X)
+    i = np.argmin(np.abs(x - x_pos))
+    j = np.argmin(np.abs(y - y_pos))
+    u[j, i] = height
+    return X, Y, u
+
+X, Y, initial_temp = spike_initial_temperatures_2D(80, 80)
+temps = solve_heat_2D(initial_temp, r_x = 0.2, r_y = 0.2, num_times=200)
 
 plt.imshow(temps[0], origin="lower", cmap="hot", extent=[0, 1, 0, 1])
 plt.colorbar(label="Temperature")
