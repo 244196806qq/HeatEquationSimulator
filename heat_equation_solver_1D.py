@@ -3,7 +3,7 @@ import numpy as np
 
 
 # solver
-def solve_heat_1d(initial_temp, r, numTimes):
+def solve_heat_1D(initial_temp, r, numTimes):
     temps = [
         np.array(initial_temp, dtype = float) # store initial as np array
         ]
@@ -29,13 +29,13 @@ def solve_heat_1d(initial_temp, r, numTimes):
 
 
 # initial condition function generator 
-def gaussian_initial_temperatures(Nx, center = 0.5, width = 0.1):
+def gaussian_initial_temperatures_1D(Nx, center = 0.5, width = 0.1):
     x = np.linspace(0, 1, int(Nx))
     initial_temp = np.exp(-((x - center) ** 2) / (2 * width ** 2))
     return x, initial_temp
 
 
-def two_peak_initial_conidtion(Nx, center1 = 0.5, width1 = 0.1, center2 = 0.5, width2 = 0.1, height1 = 1.0, height2 = 1.0):
+def two_peak_initial_condition_1D(Nx, center1 = 0.5, width1 = 0.1, center2 = 0.5, width2 = 0.1, height1 = 1.0, height2 = 1.0):
     x = np.linspace(0, 1, int(Nx))
     peak1 = height1 * np.exp(-((x - center1) ** 2) / (2 * width1 ** 2))
     peak2 = height2 * np.exp(-((x - center2) ** 2) / (2 * width2 ** 2))
@@ -43,7 +43,7 @@ def two_peak_initial_conidtion(Nx, center1 = 0.5, width1 = 0.1, center2 = 0.5, w
     return x, initial_temp
 
 
-def spikes_initial_temperatures(Nx, position=0.5, height=1.0):
+def spikes_initial_temperatures_1D(Nx, position=0.5, height=1.0):
     x = np.linspace(0, 1, int(Nx))
     initial_temp = np.zeros_like(x)
     spike_index = np.argmin(np.abs(x - position))
