@@ -5,7 +5,8 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 from heat_equation_solver_1D import gaussian_initial_temperatures_1D, solve_heat_1D, two_peak_initial_condition_1D, spikes_initial_temperatures_1D
 from heat_equation_solver_2D import gaussian_initial_temperatures_2D, solve_heat_2D, two_peak_initial_condition_2D, spike_initial_temperatures_2D
-from UI_helper import create_controls
+from UI_helper_1D import create_controls_1D
+from UI_helper_2D import create_controls_2D
 
 def run_simulation_1D(fig, canvas, initcond, alpha, Nx, numTimes, shape_controls):
     # calculate all the values for the graph
@@ -75,9 +76,9 @@ def run_simulation_1D(fig, canvas, initcond, alpha, Nx, numTimes, shape_controls
     
     update()
 
-def run_simulation_2D(fig, canvas, initcond, alpha, Nx, Ny, numTimes, center1, center2, width):
+def run_simulation_2D(fig, canvas, initcond, alpha, Nx, Ny, numTimes, shape_controls):
     # calculate all the values for the graph
-    X, Y, initial_temp = generate_initial_condition_2D(initcond, Nx, Ny, center1, center2, width)
+    X, Y, initial_temp = generate_initial_condition_2D(initcond, Nx, Ny, shape_controls)
     temps = calculate_parameter_2D(alpha, X, numTimes, initial_temp)
 
     # create the graph
@@ -97,6 +98,17 @@ def run_simulation_2D(fig, canvas, initcond, alpha, Nx, Ny, numTimes, center1, c
     fig.colorbar(img, ax = ax, label = "Temperature")
     canvas.get_tk_widget().pack(fill = "both", expand = True)
 
+    def update(frame=0):
+        if frame >= len(temps):
+            return
+
+        img.set_data(temps[frame])
+        ax.set_title(f"2D Heat Diffusion (step {frame})")
+        canvas.draw_idle()
+
+        canvas.get_tk_widget().after(30, update, frame + 1)
+
+    update()
 
 
 def generate_initial_condition_1D(initcond, Nx, shape_controls):
@@ -124,9 +136,9 @@ def calculate_parameter_1D(alpha, x, numTimes, initial_temp):
     r = alpha * deltaT / (deltaX ** 2)
     return solve_heat_1D(initial_temp, r, numTimes)
 
-def generate_initial_condition_2D(initcond, Nx, Ny, center1, center2, width):
+def generate_initial_condition_2D(initcond, Nx, Ny, shape_controls):
     if (initcond == "Gaussian"):
-        return gaussian_initial_temperatures_2D(Nx, Ny, center1, center2, width)
+        return gaussian_initial_temperatures_2D(Nx, Ny, shape_controls["centerX_slider"].get(), shape_controls["centerY_slider"].get(), shape_controls["width_slider"].get())
     # elif (initcond == "Spike"):
     #     return spike_initial_temperatures_2D(Nx, shape_controls["position_slider"].get(), shape_controls["height_slider"].get())
     # elif (initcond == "Two Peaks"):
@@ -164,10 +176,9 @@ def create_window():
     canvas = FigureCanvasTkAgg(fig, master=plot_frame)
     canvas.draw_idle()
     canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
-
-
-    run_simulation_2D(fig, canvas, "Gaussian", 0.1, 100, 100, 1000, 0.5, 0.5, 0.1)
-    # controls = create_controls(control_frame, fig, canvas, run_simulation_1D)
+    
+    # controls_1D = create_controls_1D(control_frame, fig, canvas, run_simulation_1D)
+    controls_2D = create_controls_2D(control_frame, fig, canvas, run_simulation_2D)
 
     root.mainloop()
 
