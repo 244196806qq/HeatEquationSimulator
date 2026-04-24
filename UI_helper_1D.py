@@ -20,7 +20,7 @@ def clear_frame(frame):
         widget.destroy()
 
 
-def build_parameter_controls(parameter_frame, shape_var):
+def build_parameter_controls_1D(parameter_frame, shape_var):
     clear_frame(parameter_frame)
     controls = {}
 
@@ -115,7 +115,7 @@ def build_parameter_controls(parameter_frame, shape_var):
     return controls
 
 
-def create_controls(control_frame, fig, canvas, run_simulation):
+def create_controls_1D(control_frame, fig, canvas, run_simulation_1D):
     # text for value of r
     r_label = tk.Label(control_frame, text = "r = 0.005")
 
@@ -195,17 +195,17 @@ def create_controls(control_frame, fig, canvas, run_simulation):
 
     def on_shape_change(*args):
         nonlocal shape_controls
-        shape_controls = build_parameter_controls(parameter_frame, shape_var)
+        shape_controls = build_parameter_controls_1D(parameter_frame, shape_var)
 
     shape_var.trace_add("write", on_shape_change)
 
-    shape_controls = build_parameter_controls(parameter_frame, shape_var)
+    shape_controls = build_parameter_controls_1D(parameter_frame, shape_var)
 
     # Run button
     runButton = tk.Button(
         control_frame, 
         text = "Run Animation", 
-        command = lambda: run_simulation(
+        command = lambda: run_simulation_1D(
             fig, 
             canvas, 
             shape_var.get(), 
