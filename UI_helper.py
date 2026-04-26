@@ -166,7 +166,7 @@ def make_run_button(parent, command):
     btn.pack(fill=tk.X, padx=12, pady=(10, 6))
     return btn
 
-def create_panel_1D(panel, fig, canvas, animation_state, status_var, run_simulation_1D):
+def create_panel_1D(panel, fig, canvas, animation_state, status_var, status_label, run_simulation_1D):
     section_header(panel, "Solver Parameters")
 
     alpha_scale = styled_scale(panel, "Thermal diffusivity  α", 0.001, 0.04, 0.001, 0.005)
@@ -194,7 +194,6 @@ def create_panel_1D(panel, fig, canvas, animation_state, status_var, run_simulat
 
     shape_var = tk.StringVar(value="Gaussian")
     shape_container = tk.Frame(panel, bg=PANEL)
-    shape_container.pack(fill=tk.X)
 
     shape_controls_ref = [None]
 
@@ -213,6 +212,9 @@ def create_panel_1D(panel, fig, canvas, animation_state, status_var, run_simulat
 
     rebuild_shape_controls()
 
+    shape_container.pack(fill=tk.X)
+
+
     def run_safe():
         if not nt_entry.get():
             status_var.set("⚠ Enter number of time steps")
@@ -223,6 +225,7 @@ def create_panel_1D(panel, fig, canvas, animation_state, status_var, run_simulat
             canvas,
             status_var,
             animation_state,
+            status_label,
             shape_var.get(),
             alpha_scale.get(),
             int(Nx_scale.get()),
@@ -233,47 +236,8 @@ def create_panel_1D(panel, fig, canvas, animation_state, status_var, run_simulat
     section_sep(panel)
     make_run_button(panel, run_safe)
 
-    # section_header(panel, "Initial Condition")
-    # shape_var = tk.StringVar(value="Gaussian")
-    # shape_container = tk.Frame(panel, bg=PANEL)
 
-    # def on_shape_change(*_):
-    #     build_shape_controls_1D(shape_container, shape_var.get())
-
-    # make_dropdown(panel, shape_var, ["Gaussian", "Spike", "Two Peaks"], on_shape_change)
-    # shape_container.pack(fill=tk.X)
-    # controls = build_shape_controls_1D(shape_container, shape_var.get())
-
-    # def run():
-    #     nonlocal controls
-    #     controls = build_shape_controls_1D.__wrapped__ if hasattr(build_shape_controls_1D, "__wrapped__") else controls
-    #     # Re-grab from container children via shape rebuild isn't needed; controls dict is updated live
-    #     run_simulation_1D(
-    #         fig, canvas, status_var, animation_state,
-    #         shape_var.get(), alpha_scale.get(),
-    #         int(Nx_scale.get()), int(nt_entry.get()),
-    #         controls
-    #     )
-
-    # # patch run to re-read controls each time
-    # shape_controls_ref = [build_shape_controls_1D(shape_container, shape_var.get())]
-
-    # def on_shape_change2(*_):
-    #     shape_controls_ref[0] = build_shape_controls_1D(shape_container, shape_var.get())
-    # shape_var.trace_add("write", on_shape_change2)
-
-    # def run_safe():
-    #     run_simulation_1D(
-    #         fig, canvas, status_var, animation_state,
-    #         shape_var.get(), alpha_scale.get(),
-    #         int(Nx_scale.get()), int(nt_entry.get()),
-    #         shape_controls_ref[0]
-    #     )
-
-    # section_sep(panel)
-    # make_run_button(panel, run_safe)
-
-def create_panel_2D(panel, fig, canvas, animation_state, status_var, run_simulation_2D):
+def create_panel_2D(panel, fig, canvas, animation_state, status_var, status_label, run_simulation_2D):
     section_header(panel, "Solver Parameters")
 
     alpha_scale = styled_scale(panel, "Thermal diffusivity  α", 0.001, 0.04, 0.001, 0.005)
