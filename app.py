@@ -48,6 +48,7 @@ plt.rcParams.update({
 # ─── Simulation logic ─────────────────────────────────────────────────────────
 
 def get_initial_condition_1D(initcond, Nx, controls):
+    print(controls)
     if initcond == "Gaussian":
         return gaussian_initial_temperatures_1D(
             Nx, controls["center"].get(), controls["width"].get()
@@ -79,9 +80,9 @@ def get_initial_condition_2D(initcond, Nx, Ny, controls):
     elif initcond == "Two Peaks":
         return two_peak_initial_condition_2D(
             Nx, Ny,
-            controls["center1X"].get(), controls["center1Y"].get(),
+            (controls["center1X"].get(), controls["center1Y"].get()),
             controls["width1"].get(), controls["height1"].get(),
-            controls["center2X"].get(), controls["center2Y"].get(),
+            (controls["center2X"].get(), controls["center2Y"].get()),
             controls["width2"].get(), controls["height2"].get(),
         )
     raise ValueError(f"Unknown: {initcond}")
