@@ -232,9 +232,9 @@ def run_simulation_2D(fig, canvas, status_var, animation_state, status_label, in
             fontsize=10, pad=10
         )
         if animation_state["paused"]:
-            status_var.set(f"⏸  Paused at {frame}/{numTimes}  |  r = {r:.4f}")
+            status_var.set(f"⏸  Paused at {frame}/{numTimes}  |  r_x = {r_x:.4f} |  r_y = {r_y:.4f}")
         else:
-            status_var.set(f"▶  step {frame}/{numTimes}  |  r = {r:.4f}")
+            status_var.set(f"▶  step {frame}/{numTimes}  |  r_x = {r_x:.4f} |  r_y = {r_y:.4f}")
         canvas.draw_idle()
         animation_state["after_id"] = canvas.get_tk_widget().after(
             20, update, frame + 1
