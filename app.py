@@ -48,7 +48,6 @@ plt.rcParams.update({
 # ─── Simulation logic ─────────────────────────────────────────────────────────
 
 def get_initial_condition_1D(initcond, Nx, controls):
-    print(controls)
     if initcond == "Gaussian":
         return gaussian_initial_temperatures_1D(
             Nx, controls["center"].get(), controls["width"].get()
@@ -95,7 +94,9 @@ def compute_r(alpha, Nx):
 
 # ─── 1D simulation ────────────────────────────────────────────────────────────
 
-def run_simulation_1D(fig, canvas, status_var, animation_state, initcond, alpha, Nx, numTimes, controls):
+def run_simulation_1D(fig, canvas, status_var, animation_state, status_label, initcond, alpha, Nx, numTimes, controls):
+    animation_state["running"] = True
+    status_label.config(cursor="hand2")
     if animation_state["after_id"] is not None:
         canvas.get_tk_widget().after_cancel(animation_state["after_id"])
         animation_state["after_id"] = None
@@ -143,9 +144,15 @@ def run_simulation_1D(fig, canvas, status_var, animation_state, initcond, alpha,
     fig.canvas.mpl_connect("motion_notify_event", hover)
 
     def update(frame=0):
+        if animation_state["paused"]:
+            animation_state["after_id"] = canvas.get_tk_widget().after(50, update, frame)
+            return 
+        
         if frame >= len(temps):
             animation_state["after_id"] = None
             status_var.set(f"✓  Done — r = {r:.4f}  |  steps = {numTimes}")
+            animation_state["running"] = False
+            status_label.config(cursor="arrow")
             return
         data = temps[frame]
         line.set_ydata(data)
@@ -159,23 +166,27 @@ def run_simulation_1D(fig, canvas, status_var, animation_state, initcond, alpha,
             f"1D Heat Diffusion  ·  step {frame}/{numTimes}  ·  max = {max(data):.5f}",
             fontsize=10, pad=10
         )
-        status_var.set(f"▶  step {frame}/{numTimes}  |  r = {r:.4f}")
-        print(status_var.get())
+        if animation_state["paused"]:
+            status_var.set(f"⏸  Paused at {frame}/{numTimes}  |  r = {r:.4f}")
+        else:
+            status_var.set(f"▶  step {frame}/{numTimes}  |  r = {r:.4f}")
         canvas.draw_idle()
-        animation_state["after_id"] = canvas.get_tk_widget().after(
-            20, update, frame + 1
-        )
+        animation_state["after_id"] = canvas.get_tk_widget().after(20, update, frame + 1)
 
 
     status_var.set(f"▶  Running  |  r = {r:.4f}")
     update()
 
+
 # ─── 2D simulation ────────────────────────────────────────────────────────────
 
-def run_simulation_2D(fig, canvas, status_var, animation_state, initcond, alpha, Nx, Ny, numTimes, controls):
+def run_simulation_2D(fig, canvas, status_var, animation_state, status_label, initcond, alpha, Nx, Ny, numTimes, controls):
+    animation_state["running"] = True
+    status_label.config(cursor="hand2")
     if animation_state["after_id"] is not None:
         canvas.get_tk_widget().after_cancel(animation_state["after_id"])
         animation_state["after_id"] = None
+    animation_state["paused"] = False
 
     r_x = compute_r(alpha, Nx)
     r_y = compute_r(alpha, Ny)
@@ -205,17 +216,25 @@ def run_simulation_2D(fig, canvas, status_var, animation_state, initcond, alpha,
     canvas.get_tk_widget().pack(fill="both", expand=True)
 
     def update(frame=0):
+        if animation_state["paused"]:
+            animation_state["after_id"] = canvas.get_tk_widget().after(50, update, frame)
+            return 
+        
         if frame >= len(temps):
             animation_state["after_id"] = None
             status_var.set(f"✓  Done — steps = {numTimes}")
+            animation_state["running"] = False
+            status_label.config(cursor="arrow")
             return
         img.set_data(temps[frame])
         ax.set_title(
             f"2D Heat Diffusion  ·  step {frame}/{numTimes}  ·  max = {temps[frame].max():.5f}",
             fontsize=10, pad=10
         )
-        status_var.set(f"▶  step {frame}/{numTimes}  |  r_x={r_x:.3f}  r_y={r_y:.3f}")
-        print(status_var.get())
+        if animation_state["paused"]:
+            status_var.set(f"⏸  Paused at {frame}/{numTimes}  |  r = {r:.4f}")
+        else:
+            status_var.set(f"▶  step {frame}/{numTimes}  |  r = {r:.4f}")
         canvas.draw_idle()
         animation_state["after_id"] = canvas.get_tk_widget().after(
             20, update, frame + 1
@@ -251,11 +270,12 @@ def create_window():
     status_bar.pack_propagate(False)
 
     status_var = tk.StringVar(value="Ready")
-    tk.Label(
+    status_label = tk.Label(
         status_bar, textvariable=status_var,
-        bg=SURFACE, fg=TEXT_DIM, font=("Arial", 8),
-        anchor="w", padx=12
-    ).pack(fill=tk.X, side=tk.LEFT, expand=True)
+        bg=SURFACE, fg=TEXT_DIM, font=("Arial", 16),
+        anchor="w", padx=12, cursor = "arrow"
+    )
+    status_label.pack(fill=tk.X, side=tk.LEFT, expand=True)
 
     # ── Main layout ──
     body = tk.Frame(root, bg=BG)
@@ -324,7 +344,7 @@ def create_window():
     active_dim = [None]
     tab_buttons = {}
     panels = {}
-    animation_state = {"after_id": None}
+    animation_state = {"after_id": None, "paused": False, "running": False}
 
     def switch_dim(dim):
         if active_dim[0] == dim:
@@ -337,9 +357,9 @@ def create_window():
             )
         clear_frame(inner)
         if( dim == "1D"):
-            panels[dim](inner, fig, canvas, animation_state, status_var, run_simulation_1D)
+            panels[dim](inner, fig, canvas, animation_state, status_var, status_label, run_simulation_1D)
         elif(dim == "2D"):
-            panels[dim](inner, fig, canvas, animation_state, status_var, run_simulation_2D)
+            panels[dim](inner, fig, canvas, animation_state, status_var, status_label, run_simulation_2D)
 
     for dim, label in [("1D", "1D Rod"), ("2D", "2D Plate")]:
         tab = tk.Label(
@@ -358,6 +378,21 @@ def create_window():
         tab_buttons[dim] = tab
 
     tk.Frame(tab_frame, bg=BORDER, height=1).pack(fill=tk.X, side=tk.BOTTOM)
+
+    def toggle_pause(event = None):
+        # print(animation_state["running"])
+        # print(animation_state["paused"])
+        if not animation_state["running"]:
+            return
+        
+        animation_state["paused"] = not animation_state["paused"]
+
+        if animation_state["paused"]:
+            status_var.set("⏸  Paused (click to resume)")
+        else:
+            status_var.set("▶  Running")
+
+    status_label.bind("<Button-1>", toggle_pause)
 
     panels["1D"] = create_panel_1D
     panels["2D"] = create_panel_2D
