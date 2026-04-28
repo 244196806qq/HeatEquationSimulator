@@ -41,7 +41,7 @@ A Python-based interactive simulator for visualizing heat diffusion in **1D rods
 
 This simulator solves the heat equation:
 
-\frac{\partial u}{\partial t} = \alpha \nabla^2 u
+$\frac{\partial u}{\partial t} = \alpha \nabla^2 u$
 
 Using the **explicit finite difference method**:
 
