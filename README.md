@@ -75,7 +75,7 @@ Using the **explicit finite difference method**:
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/your-username/heat-equation-simulator.git
+git clone https://github.com/244196806qq/heat-equation-simulator.git
 cd heat-equation-simulator
 ```
 
