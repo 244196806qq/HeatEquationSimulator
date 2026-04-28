@@ -51,6 +51,13 @@ Using the **explicit finite difference method**:
 * Stability condition:
   $r = \frac{\alpha \Delta t}{\Delta x^2}$
 
+* 2D:
+  $u_{i,j}^{n+1} = u_{i,j}^n + r_x (u_{i+1,j}^n - 2u_{i,j}^n + u_{i-1,j}^n)+ r_y (u_{i,j+1}^n - 2u_{i,j}^n + u_{i,j-1}^n)$
+
+* Stability condition:
+  $r_x = \frac{\alpha \Delta t}{\Delta x^2}$
+  $r_y = \frac{\alpha \Delta t}{\Delta y^2}$
+
 ---
 
 ## 📁 Project Structure
