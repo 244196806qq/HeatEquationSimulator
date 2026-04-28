@@ -46,14 +46,10 @@ $\frac{\partial u}{\partial t} = \alpha \nabla^2 u$
 Using the **explicit finite difference method**:
 
 * 1D:
-  $$
-  u_i^{n+1} = u_i^n + r (u_{i+1}^n - 2u_i^n + u_{i-1}^n)
-  $$
+  $u_i^{n+1} = u_i^n + r (u_{i+1}^n - 2u_i^n + u_{i-1}^n)$
 
 * Stability condition:
-  $$
-  r = \frac{\alpha \Delta t}{\Delta x^2}
-  $$
+  $r = \frac{\alpha \Delta t}{\Delta x^2}$
 
 ---
 
