@@ -133,12 +133,6 @@ python main.py
 
 ---
 
-## 📷 Preview
-
-*(Add screenshots or GIFs here)*
-
----
-
 ## 💡 Motivation
 
 This project was built to:
@@ -153,9 +147,3 @@ This project was built to:
 
 Devin Liang
 Applied Mathematics Student
-
----
-
-## 📄 License
-
-MIT License
