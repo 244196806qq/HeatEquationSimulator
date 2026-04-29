@@ -94,9 +94,10 @@ def compute_r(alpha, Nx):
 
 # ─── 1D simulation ────────────────────────────────────────────────────────────
 
-def run_simulation_1D(fig, canvas, status_var, animation_state, status_label, initcond, alpha, Nx, numTimes, controls):
+def run_simulation_1D(fig, canvas, status_var, animation_state, status_label, initcond, speed, alpha, Nx, numTimes, controls, boundary):
     animation_state["running"] = True
     status_label.config(cursor="hand2")
+    animation_state["speed_ms"] = speed
     if animation_state["after_id"] is not None:
         canvas.get_tk_widget().after_cancel(animation_state["after_id"])
         animation_state["after_id"] = None
@@ -107,15 +108,15 @@ def run_simulation_1D(fig, canvas, status_var, animation_state, status_label, in
         return
 
     x, initial_temp = get_initial_condition_1D(initcond, Nx, controls)
-    temps = solve_heat_1D(initial_temp, r, numTimes)
+    current = initial_temp.copy()
 
     fig.clear()
     ax = fig.add_subplot(1, 1, 1)
     ax.grid(True)
 
-    y_max = max(max(t) for t in temps) * 1.08 or 1.0
-    line, = ax.plot(x, temps[0], color=ACCENT, linewidth=1.8, alpha=0.95)
-    fill = ax.fill_between(x, temps[0], alpha=0.15, color=ACCENT)
+    y_max = np.max(initial_temp) * 1.08 or 1.0
+    line, = ax.plot(x, current, color=ACCENT, linewidth=1.8, alpha=0.95)
+    fill = ax.fill_between(x, current, alpha=0.15, color=ACCENT)
     ax.set_xlim(x[0], x[-1])
     ax.set_ylim(0, y_max)
     ax.set_xlabel("Position  x")
@@ -144,17 +145,19 @@ def run_simulation_1D(fig, canvas, status_var, animation_state, status_label, in
     fig.canvas.mpl_connect("motion_notify_event", hover)
 
     def update(frame=0):
+        nonlocal current
         if animation_state["paused"]:
-            animation_state["after_id"] = canvas.get_tk_widget().after(50, update, frame)
+            animation_state["after_id"] = canvas.get_tk_widget().after(animation_state["speed_ms"], update, frame)
             return 
         
-        if frame >= len(temps):
+        if frame > numTimes:
             animation_state["after_id"] = None
             status_var.set(f"✓  Done — r = {r:.4f}  |  steps = {numTimes}")
             animation_state["running"] = False
             status_label.config(cursor="arrow")
             return
-        data = temps[frame]
+        current = solve_heat_1D(current, r, boundary)
+        data = current
         line.set_ydata(data)
 
         # Rebuild fill_between
@@ -171,7 +174,7 @@ def run_simulation_1D(fig, canvas, status_var, animation_state, status_label, in
         else:
             status_var.set(f"▶  step {frame}/{numTimes}  |  r = {r:.4f}")
         canvas.draw_idle()
-        animation_state["after_id"] = canvas.get_tk_widget().after(20, update, frame + 1)
+        animation_state["after_id"] = canvas.get_tk_widget().after(animation_state["speed_ms"], update, frame + 1)
 
 
     status_var.set(f"▶  Running  |  r = {r:.4f}")
@@ -180,9 +183,10 @@ def run_simulation_1D(fig, canvas, status_var, animation_state, status_label, in
 
 # ─── 2D simulation ────────────────────────────────────────────────────────────
 
-def run_simulation_2D(fig, canvas, status_var, animation_state, status_label, initcond, alpha, Nx, Ny, numTimes, controls):
+def run_simulation_2D(fig, canvas, status_var, animation_state, status_label, initcond, speed, alpha, Nx, Ny, numTimes, controls, boundary):
     animation_state["running"] = True
     status_label.config(cursor="hand2")
+    animation_state["speed_ms"] = speed
     if animation_state["after_id"] is not None:
         canvas.get_tk_widget().after_cancel(animation_state["after_id"])
         animation_state["after_id"] = None
@@ -195,16 +199,16 @@ def run_simulation_2D(fig, canvas, status_var, animation_state, status_label, in
         return
 
     X, Y, initial_temp = get_initial_condition_2D(initcond, Nx, Ny, controls)
-    temps = solve_heat_2D(initial_temp, r_x, r_y, numTimes)
+    current = initial_temp.copy()
 
     fig.clear()
     ax = fig.add_subplot(1, 1, 1)
 
     vmin = 0
-    vmax = max(t.max() for t in temps) or 1.0
+    vmax = np.max(current) * 1.08 or 1.0
 
     img = ax.imshow(
-        temps[0], origin="lower", extent=[0, 1, 0, 1],
+        current, origin="lower", extent=[0, 1, 0, 1],
         aspect="auto", cmap="inferno", vmin=vmin, vmax=vmax
     )
     ax.set_xlabel("x")
@@ -216,19 +220,22 @@ def run_simulation_2D(fig, canvas, status_var, animation_state, status_label, in
     canvas.get_tk_widget().pack(fill="both", expand=True)
 
     def update(frame=0):
+        nonlocal current
         if animation_state["paused"]:
-            animation_state["after_id"] = canvas.get_tk_widget().after(50, update, frame)
+            animation_state["after_id"] = canvas.get_tk_widget().after(animation_state["speed_ms"], update, frame)
             return 
         
-        if frame >= len(temps):
+        if frame > numTimes:
             animation_state["after_id"] = None
             status_var.set(f"✓  Done — steps = {numTimes}")
             animation_state["running"] = False
             status_label.config(cursor="arrow")
             return
-        img.set_data(temps[frame])
+        
+        current = solve_heat_2D(current, r_x, r_y, boundary)
+        img.set_data(current)
         ax.set_title(
-            f"2D Heat Diffusion  ·  step {frame}/{numTimes}  ·  max = {temps[frame].max():.5f}",
+            f"2D Heat Diffusion  ·  step {frame}/{numTimes}  ·  max = {current.max():.5f}",
             fontsize=10, pad=10
         )
         if animation_state["paused"]:
@@ -344,7 +351,12 @@ def create_window():
     active_dim = [None]
     tab_buttons = {}
     panels = {}
-    animation_state = {"after_id": None, "paused": False, "running": False}
+    animation_state = {
+                        "after_id": None, 
+                        "paused": False, 
+                        "running": False, 
+                        "speed_ms": 20
+                        }
 
     def switch_dim(dim):
         if active_dim[0] == dim:
