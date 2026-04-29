@@ -2,25 +2,45 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def solve_heat_2D(initial_temp, r_x, r_y, num_times):
-    temps = [np.array(initial_temp, dtype = float)]
-    for _ in range(num_times):
-        current = temps[-1]
-        u_new = current.copy()
+# def solve_heat_2D(initial_temp, r_x, r_y, num_times):
+#     temps = [np.array(initial_temp, dtype = float)]
+#     for _ in range(num_times):
+#         current = temps[-1]
+#         u_new = current.copy()
 
-        # update the temperature at each position
-        u_new[1:-1, 1:-1] = current[1:-1, 1:-1] + r_x * (
-                                current[2:, 1:-1] - 2 * current[1:-1, 1:-1] + current[:-2, 1:-1]
-                            ) + r_y * (
-                                current[1:-1, 2:] - 2 * current[1:-1, 1:-1] + current[1:-1, :-2]
-                            )
+#         # update the temperature at each position
+#         u_new[1:-1, 1:-1] = current[1:-1, 1:-1] + r_x * (
+#                                 current[2:, 1:-1] - 2 * current[1:-1, 1:-1] + current[:-2, 1:-1]
+#                             ) + r_y * (
+#                                 current[1:-1, 2:] - 2 * current[1:-1, 1:-1] + current[1:-1, :-2]
+#                             )
+#         u_new[0, :] = current[0, :]
+#         u_new[-1, :] = current[-1, :]
+#         u_new[:, 0] = current[:, 0]
+#         u_new[:, -1] = current[:, -1]
+
+#         temps.append(u_new)
+#     return temps
+
+def solve_heat_2D(current, r_x, r_y, boundary):
+    u_new = current.copy()
+    # update the temperature at each position
+    u_new[1:-1, 1:-1] = current[1:-1, 1:-1] + r_x * (
+                            current[2:, 1:-1] - 2 * current[1:-1, 1:-1] + current[:-2, 1:-1]
+                        ) + r_y * (
+                            current[1:-1, 2:] - 2 * current[1:-1, 1:-1] + current[1:-1, :-2]
+                        )
+    if boundary == "Dirichlet": 
         u_new[0, :] = current[0, :]
         u_new[-1, :] = current[-1, :]
         u_new[:, 0] = current[:, 0]
         u_new[:, -1] = current[:, -1]
-
-        temps.append(u_new)
-    return temps
+    elif boundary == "Neumann":
+        u_new[0, :] = current[1, :]
+        u_new[-1, :] = current[-2, :]
+        u_new[:, 0] = current[:, 1]
+        u_new[:, -1] = current[:, -2]
+    return u_new
 
 def gaussian_initial_temperatures_2D(Nx, Ny, center_x, center_y, width):
     x = np.linspace(0, 1, int(Nx))
