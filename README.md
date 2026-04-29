@@ -1,4 +1,4 @@
-# 🔥 Heat Equation Simulator (Tkinter + Matplotlib)
+# Heat Equation Simulator (Tkinter + Matplotlib)
 
 A Python-based interactive simulator for visualizing heat diffusion in **1D rods** and **2D plates**, built using **Tkinter** for UI and **Matplotlib** for visualization.
 
@@ -34,6 +34,12 @@ A Python-based interactive simulator for visualizing heat diffusion in **1D rods
 
     * 1D: `r ≥ 0.5`
     * 2D: `r ≥ 0.25`
+  
+* 🧱 **Boundary Conditions**
+
+  * Dirichlet (fixed-temperature boundaries)
+  * Neumann (insulated/no-flux boundaries)
+  * Allows comparison of how edge constraints affect heat diffusion over time
 
 ---
 
