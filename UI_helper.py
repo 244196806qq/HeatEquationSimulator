@@ -151,8 +151,20 @@ def make_dropdown(parent, var, options, on_change):
         state="readonly", style="Heat.TCombobox",
         font=("Arial", 11),
     )
+    def clear_combobox_highlight():
+        cb.selection_clear()
+        cb.icursor(tk.END)
+        cb.winfo_toplevel().focus_force()
+
+    def handle_select(event):
+        if on_change is not None:
+            on_change()
+
+        cb.after(10, clear_combobox_highlight)
+
     cb.pack(fill=tk.X, padx=12, pady=4)
-    var.trace_add("write", on_change)
+    cb.bind("<<ComboboxSelected>>", handle_select)
+    # var.trace_add("write", handle_change)
     return cb
 
 def make_run_button(parent, command):
@@ -169,8 +181,8 @@ def make_run_button(parent, command):
 def create_panel_1D(panel, fig, canvas, animation_state, status_var, status_label, run_simulation_1D):
     section_header(panel, "Solver Parameters")
 
+    speed_scale = styled_scale(panel, "Animation Speed (ms)", 5, 100, 1, 20)
     alpha_scale = styled_scale(panel, "Thermal diffusivity  α", 0.001, 0.04, 0.001, 0.005)
-
     Nx_scale = styled_scale(panel, "Grid points  Nx", 10, 200, 10, 100)
 
     # numTimes entry
@@ -189,6 +201,17 @@ def create_panel_1D(panel, fig, canvas, animation_state, status_var, status_labe
     )
     nt_entry.insert(0, "1000")
     nt_entry.pack(anchor="w", pady=2)
+
+    boundary_var = tk.StringVar(value="Dirichlet")
+    def on_boundary_change(*_):
+        pass
+    
+    make_dropdown(
+        panel,
+        boundary_var,
+        ["Dirichlet", "Neumann"],
+        on_boundary_change
+    )
 
     section_header(panel, "Initial Condition")
 
@@ -227,10 +250,12 @@ def create_panel_1D(panel, fig, canvas, animation_state, status_var, status_labe
             animation_state,
             status_label,
             shape_var.get(),
+            speed_scale.get(),
             alpha_scale.get(),
             int(Nx_scale.get()),
             int(nt_entry.get()),
-            shape_controls_ref[0]
+            shape_controls_ref[0],
+            boundary_var.get()
         )
 
     section_sep(panel)
@@ -239,7 +264,8 @@ def create_panel_1D(panel, fig, canvas, animation_state, status_var, status_labe
 
 def create_panel_2D(panel, fig, canvas, animation_state, status_var, status_label, run_simulation_2D):
     section_header(panel, "Solver Parameters")
-
+    
+    speed_scale = styled_scale(panel, "Animation Speed (ms)", 5, 100, 1, 20)
     alpha_scale = styled_scale(panel, "Thermal diffusivity  α", 0.001, 0.04, 0.001, 0.005)
     Nx_scale    = styled_scale(panel, "Grid points  Nx",        10, 120, 1, 60)
     Ny_scale    = styled_scale(panel, "Grid points  Ny",        10, 120, 1, 60)
@@ -260,11 +286,21 @@ def create_panel_2D(panel, fig, canvas, animation_state, status_var, status_labe
     nt_entry.insert(0, "500")
     nt_entry.pack(anchor="w", pady=2)
 
+    boundary_var = tk.StringVar(value="Dirichlet")
+    def on_boundary_change(*_):
+        pass
+    
+    make_dropdown(
+        panel,
+        boundary_var,
+        ["Dirichlet", "Neumann"],
+        on_boundary_change
+    )
+
     section_header(panel, "Initial Condition")
 
     shape_var = tk.StringVar(value="Gaussian")
     shape_container = tk.Frame(panel, bg=PANEL)
-    shape_container.pack(fill=tk.X)
 
     shape_controls_ref = [None]
 
@@ -282,6 +318,7 @@ def create_panel_2D(panel, fig, canvas, animation_state, status_var, status_labe
     )
 
     rebuild_shape_controls()
+    shape_container.pack(fill=tk.X)
 
     def run_safe():
         if not nt_entry.get():
@@ -293,12 +330,15 @@ def create_panel_2D(panel, fig, canvas, animation_state, status_var, status_labe
             canvas,
             status_var,
             animation_state,
+            status_label,
             shape_var.get(),
+            speed_scale.get(),
             alpha_scale.get(),
             int(Nx_scale.get()),
             int(Ny_scale.get()),
             int(nt_entry.get()),
-            shape_controls_ref[0]
+            shape_controls_ref[0],
+            boundary_var.get()
         )
 
     section_sep(panel)
