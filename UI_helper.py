@@ -1,10 +1,6 @@
 import tkinter as tk
-from tkinter import ttk, font
-import numpy as np
-from matplotlib.figure import Figure
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from tkinter import ttk
 import matplotlib.pyplot as plt
-
 
 # ─── Theme ────────────────────────────────────────────────────────────────────
 BG = "#f7f9fb" # background of graph panel
@@ -100,6 +96,20 @@ def build_shape_controls_1D(container, shape):
     if shape == "Gaussian":
         c["center"] = styled_scale(container, "Center",      0.0,  1.0,  0.05,  0.5)
         c["width"]  = styled_scale(container, "Width",       0.02, 0.35, 0.01,  0.1)
+        show_analytical_var = tk.BooleanVar(value = False)
+        c["show_analytical"] = show_analytical_var
+        analytical_checkbox = tk.Checkbutton(
+            container,
+            text = "Show Analytical Solution",
+            variable = show_analytical_var,
+            bg=PANEL,
+            fg=TEXT_DIM,
+            activebackground=PANEL,
+            activeforeground=ACCENT,
+            selectcolor=SURFACE,
+            font=("Arial", 11),
+        )
+        analytical_checkbox.pack(anchor="w", padx=12, pady=(4, 8))
     elif shape == "Spike":
         c["position"] = styled_scale(container, "Position", 0.0, 1.0, 0.05, 0.5)
         c["height"]   = styled_scale(container, "Height",   0.1, 2.0, 0.05, 1.0)
@@ -236,7 +246,6 @@ def create_panel_1D(panel, fig, canvas, animation_state, status_var, status_labe
     rebuild_shape_controls()
 
     shape_container.pack(fill=tk.X)
-
 
     def run_safe():
         if not nt_entry.get():

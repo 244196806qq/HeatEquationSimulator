@@ -1,5 +1,4 @@
 import tkinter as tk
-from tkinter import ttk, font
 import numpy as np
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
@@ -10,6 +9,7 @@ from heat_equation_solver_1D import (
     solve_heat_1D,
     two_peak_initial_condition_1D,
     spikes_initial_temperatures_1D,
+    solve_heat_1D_analytical
 )
 from heat_equation_solver_2D import (
     gaussian_initial_temperatures_2D,
@@ -17,8 +17,11 @@ from heat_equation_solver_2D import (
     two_peak_initial_condition_2D,
     spike_initial_temperatures_2D,
 )
-
-from UI_helper import create_panel_1D, create_panel_2D, clear_frame
+from UI_helper import (
+    create_panel_1D, 
+    create_panel_2D, 
+    clear_frame
+)
 
 # ─── Theme ────────────────────────────────────────────────────────────────────
 BG = "#f7f9fb" # background of graph panel
@@ -109,13 +112,24 @@ def run_simulation_1D(fig, canvas, status_var, animation_state, status_label, in
 
     x, initial_temp = get_initial_condition_1D(initcond, Nx, controls)
     current = initial_temp.copy()
+    show_analytical = controls["show_analytical"].get()
+    if (show_analytical):
+        analytical = solve_heat_1D_analytical(x, 0, 0.001, alpha, controls["width"].get(), controls["center"].get())
+    else:
+        analytical = None
 
     fig.clear()
     ax = fig.add_subplot(1, 1, 1)
     ax.grid(True)
 
     y_max = np.max(initial_temp) * 1.08 or 1.0
-    line, = ax.plot(x, current, color=ACCENT, linewidth=1.8, alpha=0.95)
+    line, = ax.plot(x, current, color=ACCENT, linewidth=1.8, alpha=0.95, label = "Numerical")
+    ax.legend(facecolor='lightgrey', edgecolor='blue')
+    if show_analytical: 
+        analytical_line, = ax.plot(x, analytical, color="red", linewidth=1.8, alpha=0.95, label = "Analytical")
+        ax.legend(facecolor='lightgrey', edgecolor='blue')
+    else:
+        analytical_line = None
     fill = ax.fill_between(x, current, alpha=0.15, color=ACCENT)
     ax.set_xlim(x[0], x[-1])
     ax.set_ylim(0, y_max)
@@ -146,6 +160,7 @@ def run_simulation_1D(fig, canvas, status_var, animation_state, status_label, in
 
     def update(frame=0):
         nonlocal current
+        nonlocal analytical
         if animation_state["paused"]:
             animation_state["after_id"] = canvas.get_tk_widget().after(animation_state["speed_ms"], update, frame)
             return 
@@ -159,6 +174,9 @@ def run_simulation_1D(fig, canvas, status_var, animation_state, status_label, in
         current = solve_heat_1D(current, r, boundary)
         data = current
         line.set_ydata(data)
+        if analytical_line is not None:
+            analytical = solve_heat_1D_analytical(x, frame, 0.001, alpha, controls["width"].get(), controls["center"].get())
+            analytical_line.set_ydata(analytical)
 
         # Rebuild fill_between
         for coll in ax.collections:

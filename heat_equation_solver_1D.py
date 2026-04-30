@@ -1,31 +1,5 @@
 import numpy as np
 
-
-
-# # batch solver
-# def solve_heat_1D(initial_temp, r, numTimes):
-#     temps = [
-#         np.array(initial_temp, dtype = float) # store initial as np array
-#         ]
-#     # simulate for n times
-#     for _ in range(numTimes):
-#         current_state = temps[-1] # the current temperature values 
-#         u_new = current_state.copy()
-
-#         # update the temperature at each position
-#         u_new[1:-1] = current_state[1:-1] + r * (
-#             current_state[2:] - 2 * current_state[1:-1] + current_state[:-2]
-#         ) 
-
-#         # keep boundaries the same temperature
-#         u_new[0] = current_state[0]
-#         u_new[-1] = current_state[-1]
-
-#         # Add the new set of temperature into temps
-#         temps.append(u_new)
-
-#     return temps
-
 # step by step solver
 def solve_heat_1D(current_temp, r, boundary):
     u_new = current_temp.copy()
@@ -42,10 +16,18 @@ def solve_heat_1D(current_temp, r, boundary):
         u_new[-1] = u_new[-2]
     return u_new
 
+def solve_heat_1D_analytical(x, frame, deltaT, alpha, width, center):
+    time = frame * deltaT
+    analytical = (width/np.sqrt((width**2) + 2 * alpha * time)) * np.exp(-((x-center)**2)/(2*(width**2 + 2*alpha*time)))
+    return analytical
+
+def create_grid_1D(Nx):
+    x = np.linspace(0, 1, int(Nx))
+    return x
 
 # initial condition function generator 
 def gaussian_initial_temperatures_1D(Nx, center = 0.5, width = 0.1):
-    x = np.linspace(0, 1, int(Nx))
+    x = create_grid_1D(Nx)
     initial_temp = np.exp(-((x - center) ** 2) / (2 * width ** 2))
     return x, initial_temp
 
