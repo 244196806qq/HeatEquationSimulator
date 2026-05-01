@@ -55,6 +55,7 @@ A Python-based interactive simulator for visualizing heat diffusion in **1D rods
   0.01,0.2
   0.02,0.5
   ---
+  ```
 
 ## 🧠 Mathematical Model
 
