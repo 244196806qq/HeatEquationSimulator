@@ -41,7 +41,20 @@ A Python-based interactive simulator for visualizing heat diffusion in **1D rods
   * Neumann (insulated/no-flux boundaries)
   * Allows comparison of how edge constraints affect heat diffusion over time
 
----
+## Loading Initial Conditions from Files
+
+  The simulator supports loading custom initial temperature distributions from external data files. Users can place multiple `.csv` or `.txt` files inside a selected folder, and the application will automatically detect and display the available datasets in the UI.
+
+## File Format
+
+  Each file should contain two columns:
+
+  ```text
+  x,temp
+  0.00,0.0
+  0.01,0.2
+  0.02,0.5
+  ---
 
 ## 🧠 Mathematical Model
 
