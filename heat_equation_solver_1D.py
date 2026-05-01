@@ -21,6 +21,21 @@ def solve_heat_1D_analytical(x, frame, deltaT, alpha, width, center):
     analytical = (width/np.sqrt((width**2) + 2 * alpha * time)) * np.exp(-((x-center)**2)/(2*(width**2 + 2*alpha*time)))
     return analytical
 
+def file_initial_temperature_1D(filepath):
+    data = np.genfromtxt(
+        filepath,
+        delimiter = ",",
+        names = True
+    )
+    
+    required = {"x", "temp"}
+    if not required.issubset(data.dtype.names):
+        raise ValueError("CSV file must contain 'x' and 'temp' columns.")
+    
+    x = data["x"]
+    initial_temp = data["temp"]
+    return x, initial_temp
+
 def create_grid_1D(Nx):
     x = np.linspace(0, 1, int(Nx))
     return x
