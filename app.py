@@ -3,13 +3,15 @@ import numpy as np
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import matplotlib.pyplot as plt
+import os
 
 from heat_equation_solver_1D import (
     gaussian_initial_temperatures_1D,
     solve_heat_1D,
     two_peak_initial_condition_1D,
     spikes_initial_temperatures_1D,
-    solve_heat_1D_analytical
+    solve_heat_1D_analytical,
+    file_initial_temperature_1D
 )
 from heat_equation_solver_2D import (
     gaussian_initial_temperatures_2D,
@@ -66,6 +68,18 @@ def get_initial_condition_1D(initcond, Nx, controls):
             controls["center2"].get(), controls["width2"].get(),
             controls["height1"].get(), controls["height2"].get(),
         )
+    elif initcond == "From File":
+        folder = controls["folder_path"].get()
+        filename = controls["file_path"].get()
+        
+        if not folder:
+            raise ValueError("No folder selected.")
+        if not filename:
+            raise ValueError("No data file selected.")
+        
+        filepath = os.path.join(folder, filename)
+        return file_initial_temperature_1D(filepath)
+    
     raise ValueError(f"Unknown: {initcond}")
 
 def get_initial_condition_2D(initcond, Nx, Ny, controls):
