@@ -151,7 +151,10 @@ python main.py
 
 * Export animation (GIF / video)
 * Performance optimization (NumPy vectorization / GPU)
-
+* Drag-and-drop dataset loading
+* Real-time file reloading
+* 2D image-based temperature initialization
+* Generate temp value vs x position data file after simulation
 ---
 
 ## 💡 Motivation
@@ -167,4 +170,5 @@ This project was built to:
 ## 🧑‍💻 Author
 
 Devin Liang
+
 Applied Mathematics Student
