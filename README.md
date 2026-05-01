@@ -73,7 +73,7 @@ Using the **explicit finite difference method**:
 ├── UI_helper.py                 # UI components and control panels
 ├── heat_equation_solver_1D.py   # 1D solver + initial conditions
 ├── heat_equation_solver_2D.py   # 2D solver + initial conditions
-├── Data_Files    # Folder with Sample Data Files
+├── Data_Files                   # Folder with Sample Data Files
 ```
 
 ---
