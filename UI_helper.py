@@ -97,7 +97,7 @@ def build_shape_controls_1D(container, shape):
         c["center"] = styled_scale(container, "Center",      0.0,  1.0,  0.05,  0.5)
         c["width"]  = styled_scale(container, "Width",       0.02, 0.35, 0.01,  0.1)
         show_analytical_var = tk.BooleanVar(value = False)
-        c["show_analytical"] = show_analytical_var
+        c["show_analytical_var"] = show_analytical_var
         analytical_checkbox = tk.Checkbutton(
             container,
             text = "Show Analytical Solution",
