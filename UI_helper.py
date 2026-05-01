@@ -1,6 +1,7 @@
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, filedialog
 import matplotlib.pyplot as plt
+import os
 
 # ─── Theme ────────────────────────────────────────────────────────────────────
 BG = "#f7f9fb" # background of graph panel
@@ -73,7 +74,6 @@ def styled_scale(parent, label, from_, to, resolution, initial, width=180):
     scale.pack(fill=tk.X)
     return scale
 
-
 def section_header(parent, text):
     f = tk.Frame(parent, bg=PANEL)
     f.pack(fill=tk.X, padx=12, pady=(14, 4))
@@ -120,6 +120,61 @@ def build_shape_controls_1D(container, shape):
         c["center2"] = styled_scale(container, "Center 2",  0.0, 1.0, 0.05, 0.7)
         c["width2"]  = styled_scale(container, "Width 2",   0.02, 0.3, 0.01, 0.08)
         c["height2"] = styled_scale(container, "Height 2",  0.1, 2.0, 0.05, 1.0)
+    elif shape == "From File":
+        folder_var = tk.StringVar(value="")
+        file_var = tk.StringVar(value="")
+
+        c["folder_path"] = folder_var
+        c["file_path"] = file_var
+        file_options = []
+        def choose_folder():
+            folder = filedialog.askdirectory(title = "Select Data Folder")
+            
+            if not folder:
+                return
+            
+            folder_var.set(folder)
+            files = [
+                f for f in os.listdir(folder)
+                if f.endswith((".csv", "txt"))
+            ]
+            files.sort()
+            file_dropdown["values"] = files
+            
+            if files: 
+                file_var.set(files[0])
+            else:
+                file_var.set("")
+
+        tk.Button(
+            container,
+            text="Choose Data Folder",
+            command=choose_folder,
+            bg=SURFACE,
+            fg=TEXT_DIM,
+            relief="flat",
+            cursor="hand2",
+            font=("Arial", 11)
+        ).pack(fill=tk.X, padx=12, pady=(6, 2))
+
+        tk.Label(
+            container,
+            textvariable=folder_var,
+            bg=PANEL,
+            fg=TEXT_DIM,
+            wraplength=180,
+            font=("Arial", 8)
+        ).pack(fill=tk.X, padx=12, pady=(0, 6))
+
+        file_dropdown = ttk.Combobox(
+            container,
+            textvariable=file_var,
+            values=file_options,
+            state="readonly",
+            font=("Arial", 11)
+        )
+        file_dropdown.pack(fill=tk.X, padx = 12, pady = (2,6))
+
     return c
 
 def build_shape_controls_2D(container, shape):
@@ -239,7 +294,7 @@ def create_panel_1D(panel, fig, canvas, animation_state, status_var, status_labe
     make_dropdown(
         panel,
         shape_var,
-        ["Gaussian", "Spike", "Two Peaks"],
+        ["Gaussian", "Spike", "Two Peaks", "From File"],
         rebuild_shape_controls
     )
 
