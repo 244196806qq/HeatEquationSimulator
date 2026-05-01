@@ -112,7 +112,10 @@ def run_simulation_1D(fig, canvas, status_var, animation_state, status_label, in
 
     x, initial_temp = get_initial_condition_1D(initcond, Nx, controls)
     current = initial_temp.copy()
-    show_analytical = controls["show_analytical"].get()
+    show_analytical = (
+        initcond == "Gaussian"
+        and controls["show_analytical_var"].get()
+    )
     if (show_analytical):
         analytical = solve_heat_1D_analytical(x, 0, 0.001, alpha, controls["width"].get(), controls["center"].get())
     else:
