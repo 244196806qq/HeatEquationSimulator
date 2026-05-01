@@ -41,22 +41,6 @@ A Python-based interactive simulator for visualizing heat diffusion in **1D rods
   * Neumann (insulated/no-flux boundaries)
   * Allows comparison of how edge constraints affect heat diffusion over time
 
-## Loading Initial Conditions from Files
-
-  The simulator supports loading custom initial temperature distributions from external data files. Users can place multiple `.csv` or `.txt` files inside a selected folder, and the application will automatically detect and display the available datasets in the UI.
-
-## File Format
-
-  Each file should contain two columns:
-
-  ```text
-  x,temp
-  0.00,0.0
-  0.01,0.2
-  0.02,0.5
-  ---
-  ```
-
 ## 🧠 Mathematical Model
 
 This simulator solves the heat equation:
@@ -89,6 +73,7 @@ Using the **explicit finite difference method**:
 ├── UI_helper.py                 # UI components and control panels
 ├── heat_equation_solver_1D.py   # 1D solver + initial conditions
 ├── heat_equation_solver_2D.py   # 2D solver + initial conditions
+├── Data_Files    # Folder with Sample Data Files
 ```
 
 ---
@@ -132,6 +117,22 @@ python main.py
 
 ---
 
+## Loading Initial Conditions from Files
+
+  The simulator supports loading custom initial temperature distributions from external data files. Users can place multiple `.csv` or `.txt` files inside a selected folder, and the application will automatically detect and display the available datasets in the UI.
+
+## File Format
+
+  Each file should contain two columns:
+
+  ```text
+  x,temp
+  0.00,0.0
+  0.01,0.2
+  0.02,0.5
+  ```
+---
+
 ## 🛠️ Implementation Details
 
 * Uses **explicit finite difference method**
@@ -148,9 +149,6 @@ python main.py
 
 ## 📈 Future Improvements
 
-* Boundary condition selection (Dirichlet / Neumann)
-* Speed control slider
-* Step-by-step frame control
 * Export animation (GIF / video)
 * Performance optimization (NumPy vectorization / GPU)
 
