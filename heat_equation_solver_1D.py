@@ -21,19 +21,42 @@ def solve_heat_1D_analytical(x, frame, deltaT, alpha, width, center):
     analytical = (width/np.sqrt((width**2) + 2 * alpha * time)) * np.exp(-((x-center)**2)/(2*(width**2 + 2*alpha*time)))
     return analytical
 
+# def file_initial_temperature_1D(filepath):
 def file_initial_temperature_1D(filepath):
-    data = np.genfromtxt(
-        filepath,
-        delimiter = ",",
-        names = True
-    )
-    
-    required = {"x", "temp"}
-    if not required.issubset(data.dtype.names):
-        raise ValueError("CSV file must contain 'x' and 'temp' columns.")
-    
+    # 1. Read first line manually
+    with open(filepath, "r") as file:
+        header = file.readline().strip().replace(" ", "")
+
+    if header != "x,temp":
+        raise ValueError("File must start with header: x,temp")
+
+    # 2. Now parse data rows only
+    try:
+        data = np.genfromtxt(
+            filepath,
+            delimiter=",",
+            names=True
+        )
+    except Exception:
+        raise ValueError("Data rows must be comma-separated numbers")
+
+    # 3. Handle single-row files
+    if data.shape == ():
+        raise ValueError("File must contain at least 3 data points")
+
     x = data["x"]
     initial_temp = data["temp"]
+
+    # 4. Convert single values to arrays if needed
+    x = np.atleast_1d(x)
+    initial_temp = np.atleast_1d(initial_temp)
+
+    if len(x) < 3:
+        raise ValueError("File must contain at least 3 data points")
+
+    if np.isnan(x).any() or np.isnan(initial_temp).any():
+        raise ValueError("File contains missing or invalid numbers")
+    
     return x, initial_temp
 
 def create_grid_1D(Nx):

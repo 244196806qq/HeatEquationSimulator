@@ -129,7 +129,6 @@ def build_shape_controls_1D(container, shape):
         file_options = []
         def choose_folder():
             folder = filedialog.askdirectory(title = "Select Data Folder")
-            
             if not folder:
                 return
             

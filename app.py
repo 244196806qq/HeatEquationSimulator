@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import messagebox
 import numpy as np
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
@@ -123,8 +124,18 @@ def run_simulation_1D(fig, canvas, status_var, animation_state, status_label, in
     if r >= 0.5:
         status_var.set(f"⚠  Unstable: r = {r:.4f} ≥ 0.5 — reduce alpha or increase Nx")
         return
-
-    x, initial_temp = get_initial_condition_1D(initcond, Nx, controls)
+    try:
+        x, initial_temp = get_initial_condition_1D(initcond, Nx, controls)
+    except ValueError as e:
+        status_var.set(f"⚠ File read error")
+        messagebox.showerror("File Error", str(e))
+        return
+    except Exception as e:
+        status_var.set(f"⚠ Unexpected error")
+        messagebox.showerror("File Error", str(e))
+        print(e)
+        return
+    
     current = initial_temp.copy()
     show_analytical = (
         initcond == "Gaussian"
