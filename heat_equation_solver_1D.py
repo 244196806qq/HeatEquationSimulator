@@ -64,22 +64,22 @@ def create_grid_1D(Nx):
     return x
 
 # initial condition function generator 
-def gaussian_initial_temperatures_1D(Nx, center = 0.5, width = 0.1):
+def gaussian_initial_temperatures_1D(Nx, center, width):
     x = create_grid_1D(Nx)
     initial_temp = np.exp(-((x - center) ** 2) / (2 * width ** 2))
     return x, initial_temp
 
 
-def two_peak_initial_condition_1D(Nx, center1 = 0.5, width1 = 0.1, center2 = 0.5, width2 = 0.1, height1 = 1.0, height2 = 1.0):
-    x = np.linspace(0, 1, int(Nx))
+def two_peak_initial_condition_1D(Nx, center1, width1, center2, width2, height1, height2):
+    x = create_grid_1D(Nx)
     peak1 = height1 * np.exp(-((x - center1) ** 2) / (2 * width1 ** 2))
     peak2 = height2 * np.exp(-((x - center2) ** 2) / (2 * width2 ** 2))
     initial_temp = peak1 + peak2
     return x, initial_temp
 
 
-def spikes_initial_temperatures_1D(Nx, position=0.5, height=1.0):
-    x = np.linspace(0, 1, int(Nx))
+def spikes_initial_temperatures_1D(Nx, position, height):
+    x = create_grid_1D(Nx)
     initial_temp = np.zeros_like(x)
     spike_index = np.argmin(np.abs(x - position))
     initial_temp[spike_index] = height

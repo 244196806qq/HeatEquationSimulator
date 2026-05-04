@@ -28,22 +28,9 @@ plt.rcParams.update({
     "grid.alpha":        0.5,
 })
 
-
-# def update_r_label(alpha_slider, Nx_slider, r_label):
-#     alpha = alpha_slider.get()
-#     Nx = Nx_slider.get()
-
-#     x = np.linspace(0, 1, int(Nx))
-#     deltaX = x[1] - x[0]
-#     deltaT = 0.001
-
-#     r = alpha * deltaT / (deltaX ** 2)
-
-#     r_label.config(text = f"r = {r:.4f}")
-
 # ─── Helpers ──────────────────────────────────────────────────────────────────
 
-def styled_scale(parent, label, from_, to, resolution, initial, width=180):
+def styled_scale(parent, label, from_, to, resolution, initial):
     frame = tk.Frame(parent, bg=PANEL)
     frame.pack(fill=tk.X, padx=12, pady=3)
     row = tk.Frame(frame, bg=PANEL)
@@ -94,8 +81,8 @@ def build_shape_controls_1D(container, shape):
     clear_frame(container)
     c = {}
     if shape == "Gaussian":
-        c["center"] = styled_scale(container, "Center",      0.0,  1.0,  0.05,  0.5)
-        c["width"]  = styled_scale(container, "Width",       0.02, 0.35, 0.01,  0.1)
+        c["center"] = styled_scale(container, "Center", 0.0,  1.0,  0.05,  0.5)
+        c["width"]  = styled_scale(container, "Width", 0.02, 0.35, 0.01,  0.1)
         show_analytical_var = tk.BooleanVar(value = False)
         c["show_analytical_var"] = show_analytical_var
         analytical_checkbox = tk.Checkbutton(

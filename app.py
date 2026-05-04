@@ -31,7 +31,7 @@ BG = "#f7f9fb" # background of graph panel
 PANEL = "#ffffff" # background of sidebar panel
 SURFACE = "#eef2f6" # entry and dropdown
 BORDER = "#cbd5e1" # panel border 
-ACCENT = "#2563eb" # labels and headers
+ACCENT = "#3b82f6" # labels and headers
 TEXT = "#111827" # primary text color
 TEXT_DIM = "#4b5563" # secondary text
 SUCCESS = "#16a34a" # completion indicator
@@ -39,7 +39,7 @@ WARNING = "#dc2626" # erro indicator
 
 plt.rcParams.update({
     "figure.facecolor":  BG,
-    "axes.facecolor":    "#0a0c12",
+    "axes.facecolor":    "#111827",
     "axes.edgecolor":    BORDER,
     "axes.labelcolor":   TEXT_DIM,
     "axes.titlecolor":   TEXT,
