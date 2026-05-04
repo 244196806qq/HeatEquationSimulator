@@ -74,6 +74,9 @@ Using the **explicit finite difference method**:
 ├── heat_equation_solver_1D.py   # 1D solver + initial conditions
 ├── heat_equation_solver_2D.py   # 2D solver + initial conditions
 ├── Data_Files                   # Folder with Sample Data Files
+    ├── gaussian.txt             # File with Gaussian shape data
+    ├── spike.txt                # File with spike shape data
+    ├── two_peaks.txt            # File with two peaks shape data
 ```
 
 ---
